@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+
+import CoinbaseWalletConnect from "@/components/CoinbaseWalletConnect";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,7 +32,40 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        
+        <ToastContainer position="top-right" />
+
+        <div className="grid grid-cols-12">
+          <div className="col-span-2">
+
+            <ul className="flex flex-col gap-4 p-4">
+
+              <li>
+                <a href="/" className="text-blue-600 hover:underline">
+                  Home
+                </a>
+              </li>
+              <li>
+                <a href="/solana-tokens" className="text-blue-600 hover:underline">
+                  Solana Tokens
+                </a>
+              </li>
+              <li>
+                <a href="/base-tokens" className="text-blue-600 hover:underline">
+                  Base Tokesn
+                </a>
+              </li>
+             
+
+              </ul>
+          </div>
+
+
+          <div className="col-span-10">
+            {children}
+          </div>
+        </div>
+      
       </body>
     </html>
   );
