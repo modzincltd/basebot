@@ -5,11 +5,10 @@ let isConnected = false // Global connection state
 
 export const connectToDB = async () => {
   if (isConnected) {
-    console.log('🟢 MongoDB already connected')
+   
     return
   }
 
-  console.log("heee" + process.env.MONGODB_URI)
 
   try {
     const uri = process.env.MONGODB_URI!
