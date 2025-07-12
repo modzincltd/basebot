@@ -1,13 +1,14 @@
 // app/api/token-prices/[address]/route.ts
 
-import { NextResponse } from 'next/server'
-import { connectToDB } from '@/lib/mongo.js'
-import TokenPrice from '@/models/TokenPrice.js'
+import { NextRequest, NextResponse } from 'next/server'
+import { connectToDB } from '@/lib/mongo'
+import TokenPrice from '@/models/TokenPrice'
 
 export async function GET(
-  req: Request,
-  { params }: { params: { address: string } }
+  _req: NextRequest,
+  context: { params: Record<string, string> } // 👈 This is the golden generic
 ) {
+  const { address } = context.params
   await connectToDB()
   const now = new Date()
 
@@ -19,17 +20,18 @@ export async function GET(
   }
 
   const [allData, last5m, last1h, last6h, last24h] = await Promise.all([
-    TokenPrice.find({ address: params.address }).sort({ timestamp: 1 }),
-    TokenPrice.find({ address: params.address, timestamp: { $gte: timeRanges.last5m } }).sort({ timestamp: 1 }),
-    TokenPrice.find({ address: params.address, timestamp: { $gte: timeRanges.last1h } }).sort({ timestamp: 1 }),
-    TokenPrice.find({ address: params.address, timestamp: { $gte: timeRanges.last6h } }).sort({ timestamp: 1 }),
-    TokenPrice.find({ address: params.address, timestamp: { $gte: timeRanges.last24h } }).sort({ timestamp: 1 }),
+    TokenPrice.find({ address }).sort({ timestamp: 1 }),
+    TokenPrice.find({ address, timestamp: { $gte: timeRanges.last5m } }).sort({ timestamp: 1 }),
+    TokenPrice.find({ address, timestamp: { $gte: timeRanges.last1h } }).sort({ timestamp: 1 }),
+    TokenPrice.find({ address, timestamp: { $gte: timeRanges.last6h } }).sort({ timestamp: 1 }),
+    TokenPrice.find({ address, timestamp: { $gte: timeRanges.last24h } }).sort({ timestamp: 1 }),
   ])
 
-  const format = (arr: any[]) => arr.map(p => ({
-    timestamp: p.timestamp,
-    price: p.price
-  }))
+  const format = (arr: typeof allData) =>
+    arr.map((p) => ({
+      timestamp: p.timestamp,
+      price: p.price,
+    }))
 
   return NextResponse.json({
     allData: format(allData),

@@ -8,3 +8,4 @@ const TokenPriceSchema = new mongoose.Schema({
 })
 
 export default mongoose.models.TokenPrice || mongoose.model('TokenPrice', TokenPriceSchema)
+ 

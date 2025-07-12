@@ -1,7 +1,7 @@
 // app/api/cron/snapshot-prices/route.ts
 import { NextResponse } from 'next/server'
-import { connectToDB } from '../lib/mongo'
-import Token from '@/models/Token'
+import { connectToDB } from '@/lib/mongo'
+import Token from '@/models/Token' 
 import TokenPrice from '@/models/TokenPrice'
 import { fetchPricesFromJupiterLite } from '@/lib/fetchTokenPrices'
 

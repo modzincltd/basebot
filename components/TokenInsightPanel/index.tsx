@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { Sparklines, SparklinesLine } from "react-sparklines"
-import compactNumber from "@/utils/compactNumber.js"
-import TokenChartData from "@/components/TokenChartData"
+import compactNumber from "@/utils/compactNumber"
+//import TokenChartData  from "../TokenChartData"
 
 export default function TokenInsightPanel({ tokenAddress }: { tokenAddress: string }) {
   const [tokenData, setTokenData] = useState<any>(null)
@@ -101,7 +101,7 @@ export default function TokenInsightPanel({ tokenAddress }: { tokenAddress: stri
         </div>
       </div>
 
-      <TokenChartData tokenAddress={tokenAddress} />
+     {/*<TokenChartData tokenAddress={tokenAddress} />*/}
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
         <div><strong>Price:</strong> ${usdPrice.toFixed(6)}</div>
