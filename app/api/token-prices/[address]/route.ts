@@ -1,5 +1,5 @@
 // app/api/token-prices/[address]/route.ts
-
+export const runtime = 'nodejs'
 import { NextRequest, NextResponse } from 'next/server'
 import { connectToDB } from '@/lib/mongo'
 import TokenPrice from '@/models/TokenPrice'
