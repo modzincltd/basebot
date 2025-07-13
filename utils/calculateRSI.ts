@@ -1,5 +1,7 @@
 export const calculateRSI = (prices: number[], period: number = 14): number => {
-  if (prices.length < period) return NaN;
+  if (prices.length < period) {
+    return 0; // <-- Not enough data yet
+  }
 
   let gains = 0, losses = 0;
 
