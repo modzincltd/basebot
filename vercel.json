@@ -1,6 +1,6 @@
 {
   "crons": [{
-    "path": "/api/snapshot-prices",
+    "path": "/api/cron/snapshot-prices",
     "schedule": "* * * * *"
   }]
 }
