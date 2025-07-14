@@ -77,6 +77,10 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
             <th className="border p-2">Chain</th>
             <th className="border p-2">Status</th>
             <th className='border p-2'>Live Price</th>
+            <th className='border p-2'>L5</th>
+            <th className='border p-2'>h5</th>
+            <th className='border p-2'>RSI 5M</th>
+            <th className='border p-2'>RSI 1H</th>
             <th className="border p-2">Links</th>
             <th className='border p-2'>View</th>
           </tr>
@@ -96,9 +100,13 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
                 <td className="border p-2 font-mono text-xs"><AddressCell address={token.address} /></td>
                 <td className="border p-2">{token.chain}</td>
                 <td className="border p-2">{token.status}</td>
-                <td className='border p-2'>{token.livePrice}</td>
+                <td className='border p-2'>{token.livePrice.toFixed(4)}</td>
+                <td className="border p-2">{token.signal?.low_5m?.toFixed(6) ?? '-'}</td>
+                <td className="border p-2">{token.signal?.high_5m?.toFixed(6) ?? '-'}</td>
+                <td className="border p-2">{token.signal?.rsi_5m?.toFixed(1) ?? '-'}</td>
+                <td className="border p-2">{token.signal?.rsi_1h?.toFixed(1) ?? '-'}</td>
                 <td className='border p-2'><SolanaLinks tokenAddress={token.address} /></td>
-                <td className='border p-2'><Link href={`/token/${token.chain}/${token.address}`}>VIEW</Link></td>
+                <td className='border p-2'><Link href={`/token/${token.chain}/${token.address}`}>VIEW</Link></td>           
               </tr>
             ))
           )}
