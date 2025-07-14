@@ -23,19 +23,22 @@ export async function GET(req: Request) {
     const prices = await fetchPricesForSolanaTokens(tokenAddresses)
 
     // Get latest signal for each address
-    const signals = await TokenSignal.find({
-      address: { $in: tokenAddresses }
-    })
-      .sort({ timestamp: -1 }) // latest signals
-      .lean()
-
-    // Map address => signal
-    const signalMap = new Map<string, any>()
-    signals.forEach(sig => {
-      if (!signalMap.has(sig.address)) {
-        signalMap.set(sig.address, sig)
+   const signals = await TokenSignal.aggregate([
+      { $match: { address: { $in: tokenAddresses } } },
+      { $sort: { timestamp: -1 } },
+      {
+        $group: {
+          _id: "$address",
+          signal: { $first: "$$ROOT" }
+        }
       }
+    ])
+
+    const signalMap = new Map<string, any>()
+    signals.forEach(entry => {
+      signalMap.set(entry._id, entry.signal)
     })
+
 
     // Final enriched response
     const enriched = tokens.map(token => {
@@ -48,6 +51,8 @@ export async function GET(req: Request) {
         signal
       }
     })
+
+    console.log(enriched)
 
     return NextResponse.json(enriched)
   } catch (err: any) {

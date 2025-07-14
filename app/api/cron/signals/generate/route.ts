@@ -1,17 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { connectToDB } from '@/lib/mongo';
-import TokenPrice from '@/models/TokenPrice';
-import TokenSignal from '@/models/TokenSignal';
-import { calculateRSI } from '@/utils/calculateRSI';
+import { NextRequest, NextResponse } from 'next/server'
+import { connectToDB } from '@/lib/mongo'
+import TokenPrice from '@/models/TokenPrice'
+import TokenSignal from '@/models/TokenSignal'
+import { calculateRSI } from '@/utils/calculateRSI'
 
-export const dynamic = 'force-dynamic'; // for edge
+export const dynamic = 'force-dynamic'
+
+// 🔧 Utility functions
+const calculateSMA = (prices: number[], period: number) =>
+  prices.length >= period ? prices.slice(-period).reduce((a, b) => a + b, 0) / period : 0
+
+const calculateROC = (prices: number[], period: number) =>
+  prices.length >= period ? ((prices[prices.length - 1] - prices[prices.length - period]) / prices[prices.length - period]) * 100 : 0
+
+const calculateHigh = (prices: number[]) => prices.length ? Math.max(...prices) : 0
+const calculateLow = (prices: number[]) => prices.length ? Math.min(...prices) : 0
 
 export async function GET(req: NextRequest) {
-  connectToDB();
+  await connectToDB()
 
-  const now = new Date();
-  const start5m = new Date(now.getTime() - 5 * 60 * 1000);
-  const start1h = new Date(now.getTime() - 60 * 60 * 1000);
+
+  function cleanSignal(signal: Record<string, any>) {
+  const cleaned = { ...signal }
+
+  for (const key in cleaned) {
+    if (typeof cleaned[key] === 'number' && isNaN(cleaned[key])) {
+      cleaned[key] = null // or 0 if you prefer defaults
+    }
+  }
+
+  return cleaned
+}
+
+
+  const now = new Date()
+  const start1h = new Date(now.getTime() - 60 * 60 * 1000)
+  const start15m = new Date(now.getTime() - 15 * 60 * 1000)
+  const start10m = new Date(now.getTime() - 10 * 60 * 1000)
+  const start5m = new Date(now.getTime() - 5 * 60 * 1000)
 
   const tokenPrices = await TokenPrice.aggregate([
     {
@@ -25,48 +51,64 @@ export async function GET(req: NextRequest) {
         prices: { $push: { price: "$price", timestamp: "$timestamp" } }
       }
     }
-  ]);
+  ])
 
-  const signals = [];
+  const signals = []
 
   for (const token of tokenPrices) {
-    const sortedPrices = token.prices.sort((a, b) => a.timestamp - b.timestamp);
-    const pricesOnly = sortedPrices.map(p => p.price);
+    const sorted = token.prices.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+    const prices = sorted.map(p => p.price)
 
-    const recent5mPrices = sortedPrices.filter(p => new Date(p.timestamp) >= start5m).map(p => p.price);
+    const prices5m = sorted.filter(p => new Date(p.timestamp) >= start5m).map(p => p.price)
+    const prices10m = sorted.filter(p => new Date(p.timestamp) >= start10m).map(p => p.price)
+    const prices15m = sorted.filter(p => new Date(p.timestamp) >= start15m).map(p => p.price)
 
-    signals.push({
+    const signal = {
       address: token._id,
-      rsi_5m: calculateRSI(recent5mPrices, 14),
-      rsi_1h: calculateRSI(pricesOnly, 14),
-      high_5m: Math.max(...recent5mPrices),
-      low_5m: Math.min(...recent5mPrices),
-      high_1h: Math.max(...pricesOnly),
-      low_1h: Math.min(...pricesOnly),
-    });
+      timestamp: new Date(),
+
+      // RSI
+      rsi_3: calculateRSI(prices, 3),
+      rsi_5: calculateRSI(prices, 5),
+      rsi_14: calculateRSI(prices, 14),
+
+      // SMA
+      sma_5: calculateSMA(prices, 5),
+      sma_15: calculateSMA(prices, 15),
+
+      // ROC
+      roc_5: calculateROC(prices, 5),
+      roc_10: calculateROC(prices, 10),
+
+      // Highs/Lows
+      high_5m: calculateHigh(prices5m),
+      low_5m: calculateLow(prices5m),
+      high_15m: calculateHigh(prices15m),
+      low_15m: calculateLow(prices15m),
+      high_1h: calculateHigh(prices),
+      low_1h: calculateLow(prices),
+    }
+
+    // Validation: skip if everything is zero
+    const numericValues = Object.values(signal).filter(val => typeof val === 'number')
+    const allZero = numericValues.every(val => val === 0)
+
+    if (!allZero) {
+      signals.push(signal)
+    } else {
+      console.warn(`Skipping ${token._id} due to insufficient data`)
+    }
   }
 
-  // Save to Mongo
- for (const sig of signals) {
-  // Skip anything with NaN
-  if (
-    isNaN(sig.rsi_5m) ||
-    isNaN(sig.rsi_1h) ||
-    isNaN(sig.high_5m) ||
-    isNaN(sig.low_5m) ||
-    isNaN(sig.high_1h) ||
-    isNaN(sig.low_1h)
-  ) {
-    console.warn(`Skipping ${sig.address} due to invalid data`);
-    continue;
+  // Save to DB
+  for (const sig of signals) {
+    const cleaned = cleanSignal(sig) /// cleans and checks its a number
+    await TokenSignal.findOneAndUpdate(
+      { address: sig.address },
+      { ...cleaned },
+      { upsert: true, new: true }
+    )
   }
 
-  await TokenSignal.findOneAndUpdate(
-    { address: sig.address },
-    { ...sig, timestamp: new Date() },
-    { upsert: true, new: true }
-  );
-}
-
-  return NextResponse.json({ success: true, signals });
+  return NextResponse.json({ success: true, count: signals.length, signals })
 }
