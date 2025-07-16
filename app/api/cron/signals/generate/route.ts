@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectToDB } from '@/lib/mongo'
 import TokenPrice from '@/models/TokenPrice'
-import TokenSignal from '@/models/TokenSignal'
+import TokenSignalData from '@/models/TokenSignalData'
 import { calculateRSI } from '@/utils/calculateRSI'
 
 export const dynamic = 'force-dynamic'
@@ -67,14 +67,7 @@ export async function GET(req: NextRequest) {
       address: token._id,
       timestamp: new Date(),
 
-      // RSI
-      rsi_3: calculateRSI(prices, 3),
-      rsi_5: calculateRSI(prices, 5),
-      rsi_14: calculateRSI(prices, 14),
-
-      // SMA
-      sma_5: calculateSMA(prices, 5),
-      sma_15: calculateSMA(prices, 15),
+     
 
       // ROC
       roc_5: calculateROC(prices, 5),
@@ -87,6 +80,7 @@ export async function GET(req: NextRequest) {
       low_15m: calculateLow(prices15m),
       high_1h: calculateHigh(prices),
       low_1h: calculateLow(prices),
+      test_value: "asd"
     }
 
     // Validation: skip if everything is zero

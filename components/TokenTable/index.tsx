@@ -77,15 +77,17 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
     <th className="border p-2">Chain</th>
     <th className="border p-2">Status</th>
     <th className='border p-2'>Live</th>
-    <th className='border p-2'>L5</th>
-    <th className='border p-2'>H5</th>
-    <th className='border p-2'>H15</th>
-    <th className='border p-2'>L15</th>
-    <th className='border p-2'>RSI 3</th>
-    <th className='border p-2'>RSI 5</th>
-    <th className='border p-2'>RSI 14</th>
-    <th className='border p-2'>ROC 5</th>
-    <th className='border p-2'>SMA 5/15</th>
+  
+    
+    <th className='border p-2'>5m %</th>
+    <th className='border p-2'>30m %</th> 
+    <th className='border p-2'>1H %</th>
+    <th className='border p-2'>6H %</th>
+    <th className='border p-2'>12H %</th>
+    <th className='border p-2'>24H %</th>
+
+
+    
     <th className="border p-2">Links</th>
     <th className='border p-2'>View</th>
   </tr>
@@ -99,59 +101,69 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
     </tr>
   ) : (
     tokens.map((token) => {
-      const rsi3 = token.signal?.rsi_3
-      const rsi5 = token.signal?.rsi_5
-      const rsi14 = token.signal?.rsi_14
-      const roc5 = token.signal?.roc_5
-      const sma5 = token.signal?.sma_5
-      const sma15 = token.signal?.sma_15
-      const smaTrend =
-        sma5 > sma15 ? 'text-green-600 font-semibold' :
-        sma5 < sma15 ? 'text-red-600 font-semibold' : ''
 
+      
+      const roc5m = token.signal?.roc_5m
+      const roc30m = token.signal?.roc_30m
+      const roc1h = token.signal?.roc_1h
+      const roc6h = token.signal?.roc_6h
+      const roc12h = token.signal?.roc_12h
+      const roc24h = token.signal?.roc_24h
+     
       return (
         <tr key={token._id}>
           <td className="border p-2">{token.name}</td>
           <td className="border p-2 font-mono text-xs"><AddressCell address={token.address} /></td>
           <td className="border p-2">{token.chain}</td>
           <td className="border p-2">{token.status}</td>
-          <td className='border p-2'>{token.livePrice?.toFixed(6) ?? '-'}</td>
-          <td className="border p-2">{token.signal?.low_5m?.toFixed(6) ?? '-'}</td>
-          <td className="border p-2">{token.signal?.high_5m?.toFixed(6) ?? '-'}</td>
-          <td className="border p-2">{token.signal?.high_15m?.toFixed(6) ?? '-'}</td>
-          <td className="border p-2">{token.signal?.low_15m?.toFixed(6) ?? '-'}</td>
+          <td className='border p-2'>{token.livePrice}</td>
+         
+          
 
           <td className={`border p-2 ${
-            rsi3 !== undefined && rsi3 < 30 ? 'text-green-600 font-semibold' :
-            rsi3 > 70 ? 'text-red-600 font-semibold' : ''
+            roc5m !== undefined && roc5m > 0 ? 'text-green-600' :
+            roc5m < 0 ? 'text-red-600' : ''
           }`}>
-            {rsi3?.toFixed(1) ?? '-'}
+            {roc5m}
           </td>
 
           <td className={`border p-2 ${
-            rsi5 !== undefined && rsi5 < 30 ? 'text-green-600 font-semibold' :
-            rsi5 > 70 ? 'text-red-600 font-semibold' : ''
+            roc30m !== undefined && roc30m > 0 ? 'text-green-600' :
+            roc30m < 0 ? 'text-red-600' : ''
           }`}>
-            {rsi5?.toFixed(1) ?? '-'}
+            {roc30m}%
           </td>
 
-          <td className={`border p-2 ${
-            rsi14 !== undefined && rsi14 < 30 ? 'text-green-600 font-semibold' :
-            rsi14 > 70 ? 'text-red-600 font-semibold' : ''
+           <td className={`border p-2 ${
+            roc1h !== undefined && roc1h > 0 ? 'text-green-600' :
+            roc1h < 0 ? 'text-red-600' : ''
           }`}>
-            {rsi14?.toFixed(1) ?? '-'}
+            {roc1h}%
           </td>
 
-          <td className={`border p-2 ${
-            roc5 !== undefined && roc5 > 0 ? 'text-green-600' :
-            roc5 < 0 ? 'text-red-600' : ''
+           <td className={`border p-2 ${
+            roc6h !== undefined && roc6h > 0 ? 'text-green-600' :
+            roc1h < 0 ? 'text-red-600' : ''
           }`}>
-            {roc5?.toFixed(2) ?? '-'}%
+            {roc6h}%
           </td>
 
-          <td className={`border p-2 ${smaTrend}`}>
-            {sma5?.toFixed(6) ?? '-'} / {sma15?.toFixed(6) ?? '-'}
+           <td className={`border p-2 ${
+            roc12h !== undefined && roc12h > 0 ? 'text-green-600' :
+            roc12h < 0 ? 'text-red-600' : ''
+          }`}>
+            {roc12h}%
           </td>
+
+            <td className={`border p-2 ${
+            roc24h !== undefined && roc24h > 0 ? 'text-green-600' :
+            roc24h < 0 ? 'text-red-600' : ''
+          }`}>
+            {roc24h}%
+          </td>
+
+        
+
 
           <td className='border p-2'><SolanaLinks tokenAddress={token.address} /></td>
           <td className='border p-2'><Link href={`/token/${token.chain}/${token.address}`}>VIEW</Link></td>

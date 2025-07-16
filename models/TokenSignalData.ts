@@ -17,7 +17,7 @@ const TokenSignalSchema = new mongoose.Schema({
   low_15m: Number,
   high_1h: Number,
   low_1h: Number,
-  test_value: Number,
+  test_value: String, 
 }, { timestamps: true }); 
 
 export default mongoose.models.TokenSignal || mongoose.model("TokenSignal", TokenSignalSchema);
