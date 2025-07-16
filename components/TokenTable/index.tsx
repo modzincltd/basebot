@@ -45,7 +45,7 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
 
 
 
-    const CellChange = ({ theValue }) => {
+    const CellChange = ( {theValue} ) => {
       const numeric = typeof theValue === 'number' ? theValue : null
 
       return (
@@ -62,6 +62,34 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
         </td>
       )
     }
+    
+   const RSI = ({ theValue }) => {
+      const numeric = typeof theValue === 'number' ? theValue : null
+
+      const getColorFromRSI = (rsi: number | null) => {
+        if (rsi === null) return 'hsl(0, 0%, 80%)' // Gray fallback
+        const hue = Math.max(0, Math.min(120, (100 - rsi) * 1.2)) // Red to green
+        return `hsl(${hue}, 70%, 60%)`
+      }
+
+      const isHotBuy = numeric !== null && numeric < 40
+
+      return (
+        <td
+          className={`border p-1 text-center text-xs font-semibold text-white relative ${
+            isHotBuy ? 'animate-pulse ring-2 ring-green-300' : ''
+          }`}
+          style={{ backgroundColor: getColorFromRSI(numeric) }}
+        >
+          {isHotBuy ? '⭐ ' : ''}
+          {numeric !== null ? `${numeric.toFixed(2)}` : '—'}
+          {isHotBuy ? ' ⭐' : ''}
+        </td>
+      )
+    }
+
+
+
 
   return (
     <div className="p-4">
@@ -127,12 +155,12 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
      
       return (
         <tr key={token._id}>
-          <td className="border p-1">{token.name}</td>
+          <td className="border p-1 text-xs">{token.name}</td>
           <td className="border p-1 font-mono text-xs"><AddressCell address={token.address} /></td>
-          <td className="border p-1">{token.chain}</td>
-          <td className="border p-1">{token.status}</td>
-          <td className='border p-1'>{token?.livePrice.toFixed(6)}</td>
-          <td className='border p-1'>{token?.signal?.rsi}</td>
+          <td className="border p-1 text-xs">{token.chain}</td>
+          <td className="border p-1 text-xs">{token.status}</td>
+          <td className='border p-1 text-xs'>{token?.livePrice.toFixed(6)}</td>
+          <RSI theValue={token?.signal?.rsi} />
 
           <CellChange theValue={token?.signal?.change_5m} />
           <CellChange theValue={token?.signal?.change_30m} />

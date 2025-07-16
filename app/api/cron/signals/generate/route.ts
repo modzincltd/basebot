@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   const now = Date.now()
 
-  const period = 21 // for RSI
+  const period = 14 // for RSI
 
   const timeWindows = {
     change_5m: now - 1000 * 60 * 5,
@@ -32,7 +32,9 @@ export async function GET(req: NextRequest) {
 
     const rawPrices = prices.map(p => p.price) // Extract numbers ✅
 
+    console.log("Raw", rawPrices)
 
+ //
     const rsi = calculateRSI(rawPrices, period)
 
     const signals: Record<string, number> = {}
@@ -52,7 +54,7 @@ export async function GET(req: NextRequest) {
         signals.rsi = rsi
       }
 
-    console.log("📈 Signals for", address, signals)
+      console.log("📈 Signals for", address, signals)
 
 
       const result = await TokenSignal.findOneAndUpdate(
