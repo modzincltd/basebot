@@ -3,7 +3,12 @@
     {
     "path": "/api/cron/snapshot-prices",
     "schedule": "* * * * *"
+   },
+    {
+    "path": "/api/cron/signals/generate",
+    "schedule": "* * * * *"
    }
+
 
  ]
 }
