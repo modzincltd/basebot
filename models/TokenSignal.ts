@@ -11,6 +11,7 @@ const TokenSignalSchema = new mongoose.Schema({
   change_6h: Number,
   change_12h: Number,
   change_24h: Number,
+  rsi: Number,
 }, { timestamps: true })
 
 

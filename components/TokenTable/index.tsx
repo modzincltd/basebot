@@ -50,7 +50,7 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
 
       return (
         <td
-          className={`border p-2 text-white ${
+          className={`border p-1 text-white text-xs ${
             numeric > 0
               ? 'bg-green-500'
               : numeric < 0
@@ -92,24 +92,24 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
       <table className="w-full table-auto border-collapse">
        <thead>
   <tr className="bg-gray-200 text-left">
-    <th className="border p-2">Name</th>
-    <th className="border p-2">Address</th>
-    <th className="border p-2">Chain</th>
-    <th className="border p-2">Status</th>
-    <th className='border p-2'>Live</th>
+    <th className="border p-1">Name</th>
+    <th className="border p-1">Address</th>
+    <th className="border p-1">Chain</th>
+    <th className="border p-1">Status</th>
+    <th className='border p-1'>Live</th>
   
-    
-    <th className='border p-2'>5m %</th>
-    <th className='border p-2'>30m %</th> 
-    <th className='border p-2'>1H %</th>
-    <th className='border p-2'>6H %</th>
-    <th className='border p-2'>12H %</th>
-    <th className='border p-2'>24H %</th>
+    <th className='border p-1'>RSI</th>
+    <th className='border p-1'>5m %</th>
+    <th className='border p-1'>30m %</th> 
+    <th className='border p-1'>1H %</th>
+    <th className='border p-1'>6H %</th>
+    <th className='border p-1'>12H %</th>
+    <th className='border p-1'>24H %</th>
 
 
     
-    <th className="border p-2">Links</th>
-    <th className='border p-2'>View</th>
+    <th className="border p-1">Links</th>
+    <th className='border p-1'>View</th>
   </tr>
 </thead>
 <tbody>
@@ -127,11 +127,12 @@ export default function TokenTable({ chain: defaultChain = '' }: AddTokenFormPro
      
       return (
         <tr key={token._id}>
-          <td className="border p-2">{token.name}</td>
-          <td className="border p-2 font-mono text-xs"><AddressCell address={token.address} /></td>
-          <td className="border p-2">{token.chain}</td>
-          <td className="border p-2">{token.status}</td>
-          <td className='border p-2'>{token?.livePrice.toFixed(6)}</td>
+          <td className="border p-1">{token.name}</td>
+          <td className="border p-1 font-mono text-xs"><AddressCell address={token.address} /></td>
+          <td className="border p-1">{token.chain}</td>
+          <td className="border p-1">{token.status}</td>
+          <td className='border p-1'>{token?.livePrice.toFixed(6)}</td>
+          <td className='border p-1'>{token?.signal?.rsi}</td>
 
           <CellChange theValue={token?.signal?.change_5m} />
           <CellChange theValue={token?.signal?.change_30m} />

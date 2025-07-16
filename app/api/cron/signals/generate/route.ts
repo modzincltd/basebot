@@ -30,8 +30,10 @@ export async function GET(req: NextRequest) {
     const latestPrice = prices[0]?.price
     if (!latestPrice) continue
 
+    const rawPrices = prices.map(p => p.price) // Extract numbers ✅
 
-    const rsi = calculateRSI(prices, period)
+
+    const rsi = calculateRSI(rawPrices, period)
 
     const signals: Record<string, number> = {}
 

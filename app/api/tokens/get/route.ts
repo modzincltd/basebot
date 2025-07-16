@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     // Fetch latest signal per token
     const signals = await TokenSignal.aggregate([
       { $match: { address: { $in: tokenAddresses } } },
-      { $sort: { timestamp: -1 } },
+      { $sort: { timestamp: 1 } },
       {
         $group: {
           _id: "$address",
